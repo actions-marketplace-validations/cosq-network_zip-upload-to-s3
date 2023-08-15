@@ -20,7 +20,7 @@ inputs:
     required: true
   runtime:
     description: 'Runtime of the Lambda function'
-    default: 'python3.11'
+    default: 'python3.9'
   lambdaRole:
     description: 'ARN of the role for the Lambda function'
     required: true
