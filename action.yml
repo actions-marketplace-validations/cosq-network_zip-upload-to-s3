@@ -45,17 +45,21 @@ runs:
         aws lambda get-function --function-name ${{ inputs.lambdaName }} || exit 0
       continue-on-error: true
 
-    - name: Upload zip to S3
+    - name check outcome
       shell: bash
-      run: aws s3 cp ${{ github.workspace }}/${{ inputs.zipFileName }} s3://${{ inputs.s3BucketName }}/${{ inputs.s3ObjectKey }}
-      if: steps.check_lambda.outcome != 'success'
+      run: echo ${{ steps.check_lambda.outcome }}
 
-    - name: Deploy Lambda function
-      shell: bash
-      run: |
-        aws lambda create-function \
-          --function-name ${{ inputs.lambdaName }} \
-          --runtime ${{ inputs.runtime }} \
-          --role ${{ inputs.lambdaRole }} \
-          --handler ${{ inputs.lambdaFunctionHandler }} \
-          --code S3Bucket=${{ inputs.s3BucketName }},S3Key=${{ inputs.s3ObjectKey }}
+    # - name: Upload zip to S3
+    #   shell: bash
+    #   run: aws s3 cp ${{ github.workspace }}/${{ inputs.zipFileName }} s3://${{ inputs.s3BucketName }}/${{ inputs.s3ObjectKey }}
+    #   if: steps.check_lambda.outcome != 'success'
+
+    # - name: Deploy Lambda function
+    #   shell: bash
+    #   run: |
+    #     aws lambda create-function \
+    #       --function-name ${{ inputs.lambdaName }} \
+    #       --runtime ${{ inputs.runtime }} \
+    #       --role ${{ inputs.lambdaRole }} \
+    #       --handler ${{ inputs.lambdaFunctionHandler }} \
+    #       --code S3Bucket=${{ inputs.s3BucketName }},S3Key=${{ inputs.s3ObjectKey }}
