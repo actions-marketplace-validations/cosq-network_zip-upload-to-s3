@@ -47,7 +47,7 @@ runs:
 
     - name: check outcome
       shell: bash
-      run: echo ${{ steps.check_lambda.conclusion }}
+      run: echo ${{ steps.check_lambda.outcome }}
 
     # - name: Upload zip to S3
     #   shell: bash
