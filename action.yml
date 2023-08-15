@@ -45,15 +45,18 @@ runs:
 
     - name: Check if Lambda exists
       id: check_lambda
+      shell: bash
       run: |
         aws lambda get-function --function-name ${{ inputs.lambdaName }} || exit 0
       continue-on-error: true
 
     - name: Upload zip to S3
+      shell: bash
       run: aws s3 cp ${{ github.workspace }}/${{ inputs.zipFileName }} s3://${{ inputs.s3BucketName }}/${{ inputs.s3ObjectKey }}
       if: steps.check_lambda.outcome != 'success'
 
     - name: Deploy Lambda function
+      shell: bash
       run: |
         aws lambda create-function \
           --function-name ${{ inputs.lambdaName }} \
