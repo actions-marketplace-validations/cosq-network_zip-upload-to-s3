@@ -42,7 +42,7 @@ runs:
       id: check_lambda
       shell: bash
       run: |
-        aws lambda get-function --function-name ${{ inputs.lambdaName }} || exit 0
+        aws lambda get-function --function-name ${{ inputs.lambdaName }}
       continue-on-error: true
 
     - name: check outcome
