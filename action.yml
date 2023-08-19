@@ -1,6 +1,6 @@
 name: Zip Upload to S3
 
-description: 'Archive files, upload to S3
+description: Archive files, upload to S3
 
 inputs:
   inputFiles:
