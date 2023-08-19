@@ -1,6 +1,9 @@
 name: Zip Upload to S3
 
 description: Archive files, upload to S3
+branding:
+  icon: arrow-up-circle
+  color: gray-dark
 
 inputs:
   inputFiles:
