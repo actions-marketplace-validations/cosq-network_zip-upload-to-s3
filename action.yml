@@ -1,10 +1,10 @@
-name: Zip Deploy Lambda
+name: Zip Upload to S3
 
-description: 'Archive code files, upload to S3, and deploy Lambda function'
+description: 'Archive files, upload to S3
 
 inputs:
   inputFiles:
-    description: 'Python files to archive (e.g., *.py)'
+    description: 'Files to archive (e.g., *.*)'
     required: true
   s3BucketName:
     description: 'Name of the S3 bucket'
@@ -15,18 +15,10 @@ inputs:
   s3ObjectKey:
     description: 'S3 object key for the uploaded Zip archive'
     required: true
-  lambdaName:
-    description: 'Name of the Lambda function'
-    required: true
-  runtime:
-    description: 'Runtime of the Lambda function'
-    default: 'python3.9'
-  lambdaRole:
-    description: 'ARN of the role for the Lambda function'
-    required: true
-  lambdaFunctionHandler:
-    description: 'Handler of the Lambda function'
-    required: true
+  addDirectoryPath:
+    description: 'Whether to include the directory path in the zipped archive'
+    type: boolean
+    required: false
 
 runs:
   using: 'composite'
@@ -36,31 +28,13 @@ runs:
 
     - name: Archive Python files
       shell: bash
-      run: zip -r ${{ github.workspace }}/${{ inputs.zipFileName }} ${{ inputs.inputFiles }}
-
-    - name: Check if Lambda exists
-      id: check_lambda
-      shell: bash
       run: |
-        aws lambda get-function --function-name ${{ inputs.lambdaName }}
-      continue-on-error: true
-
-    - name: check outcome
-      shell: bash
-      run: echo ${{ steps.check_lambda.outcome }}
+        if [[ "${{ inputs.addDirectoryPath }}" == "true" ]]; then
+          zip -r ${{ github.workspace }}/${{ inputs.zipFileName }} ${{ inputs.inputFiles }}
+        else
+          zip -jr ${{ github.workspace }}/${{ inputs.zipFileName }} ${{ inputs.inputFiles }}
+        fi
 
     - name: Upload zip to S3
       shell: bash
       run: aws s3 cp ${{ github.workspace }}/${{ inputs.zipFileName }} s3://${{ inputs.s3BucketName }}/${{ inputs.s3ObjectKey }}
-      if: steps.check_lambda.outcome != 'success'
-
-    - name: Deploy Lambda function
-      shell: bash
-      run: |
-        aws lambda create-function \
-          --function-name ${{ inputs.lambdaName }} \
-          --runtime ${{ inputs.runtime }} \
-          --role ${{ inputs.lambdaRole }} \
-          --handler ${{ inputs.lambdaFunctionHandler }} \
-          --code S3Bucket=${{ inputs.s3BucketName }},S3Key=${{ inputs.s3ObjectKey }}
-      if: steps.check_lambda.outcome != 'success'
